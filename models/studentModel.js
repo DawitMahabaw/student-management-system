@@ -9,10 +9,7 @@ import connection from "../config/database.js";
 export function getAllStudents(callback) {
   const sql = "SELECT * FROM students";
   connection.query(sql, (err, results) => {
-    if (err) {
-      callback(err, null);
-      return;
-    }
+    if (err) return callback(err, null);
     callback(null, results);
   });
 }
@@ -24,12 +21,22 @@ export function getAllStudents(callback) {
 // "edit student" screen (to pre-fill the form with existing data).
 export function getStudentById(id, callback) {
   const sql = "SELECT * FROM students WHERE id = ?";
-
   connection.query(sql, [id], (err, results) => {
-    if (err) {
-      callback(err, null);
-      return;
-    }
+    if (err) return callback(err, null);
+    callback(null, results[0]);
+  });
+}
+
+// ------------------------------------------------
+// GET student by EMAIL
+// ------------------------------------------------
+// Used by the Student dashboard. Since we don't have real sessions,
+// the frontend tells us WHICH student is asking by sending their
+// login email. We look up the matching row in the students table.
+export function getStudentByEmail(email, callback) {
+  const sql = "SELECT * FROM students WHERE email = ?";
+  connection.query(sql, [email], (err, results) => {
+    if (err) return callback(err, null);
     callback(null, results[0]);
   });
 }
@@ -84,19 +91,11 @@ export function updateStudent(id, studentData, callback) {
   });
 }
 
-
 // DELETE a student
 export function deleteStudent(id, callback) {
   const sql = "DELETE FROM students WHERE id = ?";
-
   connection.query(sql, [id], (err, result) => {
-    if (err) {
-      callback(err, null);
-      return;
-    }
+    if (err) return callback(err, null);
     callback(null, result);
   });
 }
-
-// result.affectedRows tells us if a row was actually deleted (1) or
-// if nothing matched that ID (0).
